@@ -74,7 +74,10 @@ export default function Home() {
             </button>
           </div>
         </div>
-        <div className="col-span-5 border-l-[1px] border-r-[1px] border-slate-500  ">
+        <div className="col-span-5 h-screen overflow-y-auto  border-l-[1px] border-r-[1px] border-slate-500  ">
+          <FeedCard />
+          <FeedCard />
+          <FeedCard />
           <FeedCard />
           <FeedCard />
           <FeedCard />
