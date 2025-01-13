@@ -3,6 +3,8 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { Toaster } from "react-hot-toast";
+import { QueryProvider } from "@/components/ClientSideHelperFn";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -25,14 +27,17 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <GoogleOAuthProvider clientId="813194576123-pnhq43vv2nbjvf4r2qd86nndirp7ggbd.apps.googleusercontent.com">
-        <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-        >
-          {children}
-          <Toaster />
-        </body>
-      </GoogleOAuthProvider>
+      <QueryProvider>
+        <GoogleOAuthProvider clientId="813194576123-pnhq43vv2nbjvf4r2qd86nndirp7ggbd.apps.googleusercontent.com">
+          <body
+            className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+          >
+            {children}
+            <Toaster />
+            <ReactQueryDevtools />
+          </body>
+        </GoogleOAuthProvider>
+      </QueryProvider>
     </html>
   );
 }

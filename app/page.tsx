@@ -1,9 +1,12 @@
+"use client";
 import { BsTwitter, BsBell, BsEnvelope, BsBookmark } from "react-icons/bs";
 import React from "react";
 import { BiHash, BiHomeCircle, BiMoney, BiUser } from "react-icons/bi";
 import { SlOptions } from "react-icons/sl";
 import FeedCard from "@/components/FeedCard";
-import { LoginComponent } from "@/components/LoginComponent";
+import { LoginComponent } from "@/components/ClientSideHelperFn";
+import { useCurrentUser } from "@/hooks/user";
+import Image from "next/image";
 
 interface TwitterSidebarButton {
   title: string;
@@ -45,10 +48,14 @@ const SidebarMenuItem: TwitterSidebarButton[] = [
 ];
 
 export default function Home() {
+  const { user } = useCurrentUser();
+
+  console.log(user);
+
   return (
     <div>
       <div className="grid grid-cols-12 h-screen w-screen px-56  ">
-        <div className="col-span-4 pt-8 ml-32 px-2 pr-4  ">
+        <div className="col-span-4 relative pt-8 ml-32 px-2 pr-4  ">
           <div
             className="text-3xl  cursor-pointer transition-all h-fit w-fit p-5
                         hover:bg-gray-600 rounded-full"
@@ -74,6 +81,24 @@ export default function Home() {
               Tweet
             </button>
           </div>
+          {user && (
+            <div className="mt-5 absolute bottom-5 flex gap-2 items-center bg-slate-800 py-5 px-2 rounded-full  ">
+              {user && user.profileImageURL && (
+                <Image
+                  className="rounded-full "
+                  src={user?.profileImageURL}
+                  alt="user-image"
+                  height={50}
+                  width={50}
+                />
+              )}
+              <div>
+                <h3 className="text-xl">
+                  {user.firstName} {user.lastName}
+                </h3>
+              </div>
+            </div>
+          )}
         </div>
         <div className="col-span-5 h-screen overflow-y-auto  border-l-[1px] border-r-[1px] border-slate-500  ">
           <FeedCard />
@@ -84,10 +109,12 @@ export default function Home() {
           <FeedCard />
         </div>
         <div className="col-span-3 p-5 ">
-          <div className="border p-5 bg-slate-700 rounded-lg">
-            <h1 className="my-2 text-2xl">New to twitter?</h1>
-            <LoginComponent />
-          </div>
+          {!user && (
+            <div className="border p-5 bg-slate-700 rounded-lg">
+              <h1 className="my-2 text-2xl">New to twitter?</h1>
+              <LoginComponent />:
+            </div>
+          )}
         </div>
       </div>
     </div>
