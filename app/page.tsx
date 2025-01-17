@@ -1,7 +1,13 @@
 "use client";
 import { BsTwitter, BsBell, BsEnvelope, BsBookmark } from "react-icons/bs";
-import React from "react";
-import { BiHash, BiHomeCircle, BiMoney, BiUser } from "react-icons/bi";
+import React, { useCallback } from "react";
+import {
+  BiHash,
+  BiHomeCircle,
+  BiImageAlt,
+  BiMoney,
+  BiUser,
+} from "react-icons/bi";
 import { SlOptions } from "react-icons/sl";
 import FeedCard from "@/components/FeedCard";
 import { LoginComponent } from "@/components/ClientSideHelperFn";
@@ -50,7 +56,12 @@ const SidebarMenuItem: TwitterSidebarButton[] = [
 export default function Home() {
   const { user } = useCurrentUser();
 
-  console.log(user);
+  const handleSelectImage = useCallback(() => {
+    const input = document.createElement("input");
+    input.setAttribute("type", "file");
+    input.setAttribute("accept", "image/*");
+    input.click();
+  }, []);
 
   return (
     <div>
@@ -101,6 +112,43 @@ export default function Home() {
           )}
         </div>
         <div className="col-span-5 h-screen overflow-y-auto  border-l-[1px] border-r-[1px] border-slate-500  ">
+          <div>
+            <div
+              className="border border-gray-600 border-b-0 
+            border-r-0 border-l-0  p-4 hover:bg-zinc-900 
+            bg-opacity-40  transition-all  "
+            >
+              <div className="grid grid-cols-12 gap-3">
+                <div className="col-span-1">
+                  {user?.profileImageURL && (
+                    <Image
+                      className="rounded-full"
+                      src={user?.profileImageURL}
+                      alt="user-image"
+                      height={50}
+                      width={50}
+                    />
+                  )}
+                </div>
+                <div className="col-span-11">
+                  <textarea
+                    placeholder="What's happening?"
+                    className="w-full bg-transparent text-xl px-3 border-b border-slate-700  "
+                    rows={3}
+                  />
+                  <div className="mt-2 flex justify-between items-center  ">
+                    <BiImageAlt
+                      onClick={handleSelectImage}
+                      className="text-xl cursor-pointer  "
+                    />
+                    <button className="bg-[#1d9bf0] font-semibold text-lg  px-4 py-2  mt-5 rounded-full  mx-4   ">
+                      Tweet
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
           <FeedCard />
           <FeedCard />
           <FeedCard />
@@ -112,7 +160,7 @@ export default function Home() {
           {!user && (
             <div className="border p-5 bg-slate-700 rounded-lg">
               <h1 className="my-2 text-2xl">New to twitter?</h1>
-              <LoginComponent />:
+              <LoginComponent />
             </div>
           )}
         </div>

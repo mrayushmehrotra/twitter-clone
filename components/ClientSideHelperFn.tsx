@@ -30,6 +30,7 @@ export function LoginComponent() {
       if (verifyGoogleToken) {
         window.localStorage.setItem("__twitter_token", verifyGoogleToken);
       }
+      // @ts-except-error
       await queryClient.invalidateQueries(["current-user"]);
     },
     [queryClient],
