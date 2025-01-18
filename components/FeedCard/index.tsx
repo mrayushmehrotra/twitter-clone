@@ -1,3 +1,4 @@
+import { Tweet } from "@/gql/graphql";
 import Image from "next/image";
 import React from "react";
 import { AiOutlineHeart } from "react-icons/ai";
@@ -5,7 +6,12 @@ import { AiOutlineHeart } from "react-icons/ai";
 import { BiMessageRounded, BiUpload } from "react-icons/bi";
 import { FaRetweet } from "react-icons/fa";
 
-const FeedCard: React.FC = () => {
+interface FeedCardProps {
+  data: Tweet;
+}
+
+const FeedCard: React.FC<FeedCardProps> = (props) => {
+  const { data } = props;
   return (
     <div
       className="border border-gray-600 border-b-0 
@@ -14,21 +20,22 @@ const FeedCard: React.FC = () => {
     >
       <div className="grid grid-cols-12 gap-x-3 ">
         <div className="col-span-1  ">
-          <Image
-            className="rounded-full"
-            src="https://avatars.githubusercontent.com/u/110099419?v=4"
-            alt="logo"
-            height={60}
-            width={60}
-          />
+          {data.author.profileImageURL && (
+            <Image
+              className="rounded-full"
+              src={data.author.profileImageURL}
+              alt="logo"
+              height={60}
+              width={60}
+            />
+          )}
         </div>
         <div className="col-span-11">
-          <h5>Ayush Mehrotra</h5>
-          <p>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Libero
-            consequuntur, architecto iusto sequi eum praesentium vitae pariatur
-            blanditiis labore quod impedit delectus aliquam!
-          </p>
+          <h5>
+            {" "}
+            {data.author.firstName} {data.author.lastName}{" "}
+          </h5>
+          <p>{data.content}</p>
           <div className="flex justify-between mt-5 p-2 text-xl items-center ">
             <div>
               <BiMessageRounded />

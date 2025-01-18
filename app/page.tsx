@@ -13,6 +13,8 @@ import FeedCard from "@/components/FeedCard";
 import { LoginComponent } from "@/components/ClientSideHelperFn";
 import { useCurrentUser } from "@/hooks/user";
 import Image from "next/image";
+import { useGetAllTweets } from "@/hooks/tweet";
+import { Tweet } from "@/gql/graphql";
 
 interface TwitterSidebarButton {
   title: string;
@@ -55,6 +57,7 @@ const SidebarMenuItem: TwitterSidebarButton[] = [
 
 export default function Home() {
   const { user } = useCurrentUser();
+  const { tweets = [] } = useGetAllTweets();
 
   const handleSelectImage = useCallback(() => {
     const input = document.createElement("input");
@@ -149,12 +152,9 @@ export default function Home() {
               </div>
             </div>
           </div>
-          <FeedCard />
-          <FeedCard />
-          <FeedCard />
-          <FeedCard />
-          <FeedCard />
-          <FeedCard />
+          {tweets?.map((tweet) =>
+            tweet ? <FeedCard key={tweet?.id} data={tweet as Tweet} /> : null,
+          )}
         </div>
         <div className="col-span-3 p-5 ">
           {!user && (
