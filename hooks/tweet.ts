@@ -11,11 +11,15 @@ export const useCreateTweet = () => {
     const mutation = useMutation({
       mutationFn: (payload: CreateTweetData) =>
         graphQLClient.request(createTweetMutation, { payload }),
-      onMutate: () => toast.loading("Creating tweet... "),
+
+      onMutate: () => toast.loading("Creating tweet ", { id: "1" }),
       // TODO: Fix this typeScript Error
-      onError: (error) => toast.error(error.message),
+      onError: (error) => console.log(error),
+
       onSuccess: async () => {
+        //@ts-except-error
         await queryClient.invalidateQueries(["all-tweets"]);
+        toast.success("Created Success", { id: "1" });
       },
     });
     return mutation;
