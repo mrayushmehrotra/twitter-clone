@@ -13,6 +13,7 @@ export function LoginComponent() {
   const handleLoginWithGoogle = useCallback(
     async (cred: CredentialResponse) => {
       const googleToken = cred.credential;
+      console.log(googleToken);
       if (!googleToken || googleToken === undefined) {
         return toast.error("Google Token not found");
       }
