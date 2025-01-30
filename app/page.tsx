@@ -7,26 +7,69 @@ import Image from "next/image";
 import { BiImageAlt } from "react-icons/bi";
 import FeedCard from "@/components/FeedCard";
 import { Tweet } from "@/gql/graphql";
+import { graphQLClient } from "./clients/api";
+import { getSignedURLForTweetQuery } from "@/graphql/query/tweet";
+import axios from "axios";
+import toast from "react-hot-toast";
 
 export default function Home() {
   const { user } = useCurrentUser();
   const { tweets = [] } = useGetAllTweets();
   //  TODO: FIx this typescript error in future
+  //  @ts-expect-error
   const { mutate } = useCreateTweet();
   const [content, setContent] = useState("");
+  const [imageURL, setImageURL] = useState("");
+
+  const handleInputChangeFile = useCallback((input: HTMLInputElement) => {
+    return async (event: Event) => {
+      event.preventDefault();
+      const file: File | null | undefined = input.files?.item(0);
+      if (!file) return;
+      const { getSignedURLForTweet } = await graphQLClient.request(
+        getSignedURLForTweetQuery,
+        {
+          imageName: file.name,
+          imageType: file.type,
+        },
+      );
+      if (getSignedURLForTweet) {
+        toast.loading("uploading", { id: "2" });
+        await axios.put(getSignedURLForTweet, file, {
+          headers: {
+            "Content-Type": file.type,
+          },
+        });
+        toast.success("upload completed", { id: "2" });
+        const url = new URL(getSignedURLForTweet);
+        const myFilePath = `${url.origin}${url.pathname}`;
+        setImageURL(myFilePath);
+      }
+      toast.error("aws error");
+    };
+  }, []);
 
   const handleSelectImage = useCallback(() => {
     const input = document.createElement("input");
     input.setAttribute("type", "file");
     input.setAttribute("accept", "image/*");
     input.click();
-  }, []);
 
+    const handleFn = handleInputChangeFile(input);
+    input.addEventListener("change", handleFn);
+  }, [handleInputChangeFile]);
   const handleCreateTweet = useCallback(() => {
-    mutate({
-      content,
-    });
-  }, [content, mutate]);
+    try {
+      mutate({
+        content,
+        imageURL,
+      });
+      setContent("");
+    } catch (err) {
+      console.log(err);
+      toast.error("something went wrong");
+    }
+  }, [content, mutate, imageURL]);
 
   return (
     <div>
@@ -57,6 +100,14 @@ export default function Home() {
                   className="w-full bg-transparent text-xl px-3 border-b border-slate-700  "
                   rows={3}
                 />
+                {imageURL && (
+                  <Image
+                    src={imageURL}
+                    alt="tweet-img"
+                    width={300}
+                    height={300}
+                  />
+                )}
                 <div className="mt-2 flex justify-between items-center  ">
                   <BiImageAlt
                     onClick={handleSelectImage}

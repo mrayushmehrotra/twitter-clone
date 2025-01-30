@@ -1,14 +1,14 @@
 import React from "react";
-import type { NextPage } from "next";
 import TwitterLayout from "@/components/layout/TwitterLayout";
-const page: NextPage = () => {
-  return (
-    <div>
-      <TwitterLayout>
-        <h1>Hello </h1>
-      </TwitterLayout>
-    </div>
-  );
-};
+import { fetchTweets } from "@/app/api/tweets/fetchTweets";
+import UserProfile from "@/components/UserProfile"; // Client Component
 
-export default page;
+export default async function Page() {
+  const tweets = await fetchTweets(); // Fetch tweets on the server
+
+  return (
+    <TwitterLayout>
+      <UserProfile tweets={tweets} />
+    </TwitterLayout>
+  );
+}

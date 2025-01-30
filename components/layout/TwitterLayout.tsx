@@ -1,6 +1,6 @@
 "use client";
-import React from "react";
-
+// TODO: the useCurrentUser can throw error, because this page is ssr designed and that fn is client side, (which can't be passed)
+import React, { useMemo } from "react";
 import { LoginComponent } from "@/components/ClientSideHelperFn";
 import Image from "next/image";
 
@@ -8,6 +8,7 @@ import { BsTwitter, BsBell, BsEnvelope, BsBookmark } from "react-icons/bs";
 import { BiHash, BiHomeCircle, BiMoney, BiUser } from "react-icons/bi";
 import { SlOptions } from "react-icons/sl";
 import { useCurrentUser } from "@/hooks/user";
+import Link from "next/link";
 
 interface TwitterlayoutProps {
   children: React.ReactNode;
@@ -15,45 +16,57 @@ interface TwitterlayoutProps {
 interface TwitterSidebarButton {
   title: string;
   icon: React.ReactNode;
+  link: string;
 }
-
-const SidebarMenuItem: TwitterSidebarButton[] = [
-  {
-    title: "Home",
-    icon: <BiHomeCircle />,
-  },
-  {
-    title: "Explore",
-    icon: <BiHash />,
-  },
-  {
-    title: "Notifications",
-    icon: <BsBell />,
-  },
-  {
-    title: "Messages",
-    icon: <BsEnvelope />,
-  },
-  {
-    title: "Bookmark",
-    icon: <BsBookmark />,
-  },
-  {
-    title: "Twitter Blue",
-    icon: <BiMoney />,
-  },
-  {
-    title: "Profile",
-    icon: <BiUser />,
-  },
-  {
-    title: "More",
-    icon: <SlOptions />,
-  },
-];
 
 const TwitterLayout: React.FC<TwitterlayoutProps> = (props) => {
   const { user } = useCurrentUser();
+
+  const sidebarMenuItems: TwitterSidebarButton[] = useMemo(
+    () => [
+      {
+        title: "Home",
+        icon: <BiHomeCircle />,
+        link: "/",
+      },
+      {
+        title: "Explore",
+        icon: <BiHash />,
+        link: "/",
+      },
+      {
+        title: "Notifications",
+        icon: <BsBell />,
+        link: "/",
+      },
+      {
+        title: "Messages",
+        icon: <BsEnvelope />,
+        link: "/",
+      },
+      {
+        title: "Bookmark",
+        icon: <BsBookmark />,
+        link: "/",
+      },
+      {
+        title: "Twitter Blue",
+        icon: <BiMoney />,
+        link: "/",
+      },
+      {
+        title: "Profile",
+        icon: <BiUser />,
+        link: `/${user?.id}`,
+      },
+      {
+        title: "More",
+        icon: <SlOptions />,
+        link: "/",
+      },
+    ],
+    [user?.id],
+  );
 
   return (
     <div>
@@ -70,14 +83,16 @@ const TwitterLayout: React.FC<TwitterlayoutProps> = (props) => {
 
             <div className="mt-4  text-xl font-semibold px-2 pr-4 ">
               <ul>
-                {SidebarMenuItem.map((item) => (
-                  <li
-                    className="flex w-fit gap-y-4 mt-5   rounded-full hover:bg-gray-600
+                {sidebarMenuItems.map((item) => (
+                  <li key={item.title}>
+                    <Link
+                      className="flex w-fit gap-y-4 gap-x-2  mt-5   rounded-full hover:bg-gray-600
                     sm:py-2 sm:px-4 py-1 justify-start items-center "
-                    key={item.title}
-                  >
-                    <span className="text-3xl">{item.icon}</span>
-                    <span className="hidden sm:inline">{item.title}</span>
+                      href={item.link}
+                    >
+                      <span className="text-3xl">{item.icon}</span>
+                      <span className="hidden sm:inline">{item.title}</span>
+                    </Link>
                   </li>
                 ))}
               </ul>
@@ -107,7 +122,7 @@ const TwitterLayout: React.FC<TwitterlayoutProps> = (props) => {
                   />
                 )}
                 <div>
-                  <h3 className="text-xl">
+                  <h3 className="sm:text-xl hidden ">
                     {user.firstName} {user.lastName}
                   </h3>
                 </div>
