@@ -12,40 +12,47 @@ import { getSignedURLForTweetQuery } from "@/graphql/query/tweet";
 import axios from "axios";
 import toast from "react-hot-toast";
 
+interface HomeProps {
+  tweets?: Tweet[];
+}
+
 export default function Home() {
   const { user } = useCurrentUser();
   const { tweets = [] } = useGetAllTweets();
   //  TODO: FIx this typescript error in future
-  //  @ts-expect-error
-  const { mutate } = useCreateTweet();
+  // @ts-expect-error
+  const { mutateAsync } = useCreateTweet();
   const [content, setContent] = useState("");
   const [imageURL, setImageURL] = useState("");
 
   const handleInputChangeFile = useCallback((input: HTMLInputElement) => {
     return async (event: Event) => {
-      event.preventDefault();
-      const file: File | null | undefined = input.files?.item(0);
-      if (!file) return;
-      const { getSignedURLForTweet } = await graphQLClient.request(
-        getSignedURLForTweetQuery,
-        {
-          imageName: file.name,
-          imageType: file.type,
-        },
-      );
-      if (getSignedURLForTweet) {
-        toast.loading("uploading", { id: "2" });
-        await axios.put(getSignedURLForTweet, file, {
-          headers: {
-            "Content-Type": file.type,
+      try {
+        event.preventDefault();
+        const file: File | null | undefined = input.files?.item(0);
+        if (!file) return;
+        const { getSignedURLForTweet } = await graphQLClient.request(
+          getSignedURLForTweetQuery,
+          {
+            imageName: file.name,
+            imageType: file.type,
           },
-        });
-        toast.success("upload completed", { id: "2" });
-        const url = new URL(getSignedURLForTweet);
-        const myFilePath = `${url.origin}${url.pathname}`;
-        setImageURL(myFilePath);
+        );
+        if (getSignedURLForTweet) {
+          toast.loading("uploading", { id: "2" });
+          await axios.put(getSignedURLForTweet, file, {
+            headers: {
+              "Content-Type": file.type,
+            },
+          });
+          toast.success("upload completed", { id: "2" });
+          const url = new URL(getSignedURLForTweet);
+          const myFilePath = `${url.origin}${url.pathname}`;
+          setImageURL(myFilePath);
+        }
+      } catch (err) {
+        toast.error("aws error", { id: "2" });
       }
-      toast.error("aws error");
     };
   }, []);
 
@@ -60,7 +67,7 @@ export default function Home() {
   }, [handleInputChangeFile]);
   const handleCreateTweet = useCallback(() => {
     try {
-      mutate({
+      mutateAsync({
         content,
         imageURL,
       });
@@ -69,7 +76,7 @@ export default function Home() {
       console.log(err);
       toast.error("something went wrong");
     }
-  }, [content, mutate, imageURL]);
+  }, [content, mutateAsync, imageURL]);
 
   return (
     <div>

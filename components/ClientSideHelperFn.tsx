@@ -13,7 +13,7 @@ export function LoginComponent() {
   const handleLoginWithGoogle = useCallback(
     async (cred: CredentialResponse) => {
       const googleToken = cred.credential;
-      console.log(googleToken);
+
       if (!googleToken || googleToken === undefined) {
         return toast.error("Google Token not found");
       }
@@ -26,7 +26,6 @@ export function LoginComponent() {
       );
 
       toast.success("Verified successfully");
-      console.log(verifyGoogleToken);
 
       if (verifyGoogleToken) {
         window.localStorage.setItem("__twitter_token", verifyGoogleToken);

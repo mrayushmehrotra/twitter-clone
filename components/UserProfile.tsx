@@ -3,16 +3,14 @@
 import React from "react";
 import { BsArrowLeftShort } from "react-icons/bs";
 import Image from "next/image";
-import { useCurrentUser } from "@/hooks/user";
+import { useCurrentUser, useGetUserById } from "@/hooks/user";
 import FeedCard from "@/components/FeedCard";
 import { Tweet } from "@/gql/graphql";
 
-interface UserProfileProps {
-  tweets: Tweet[];
-}
-
-const UserProfile: React.FC<UserProfileProps> = ({ tweets }) => {
+const UserProfile = () => {
   const { user } = useCurrentUser();
+  console.log(user);
+  if (!user) return null;
 
   return (
     <div>
@@ -28,20 +26,24 @@ const UserProfile: React.FC<UserProfileProps> = ({ tweets }) => {
       <div className="p-4 border-b border-slate-800">
         {user?.profileImageURL && (
           <Image
-            src={user?.profileImageURL}
-            alt={user?.firstName}
+            src={user.profileImageURL}
+            alt={user.firstName}
             className="rounded-full"
             width={100}
             height={100}
           />
         )}
         <h1 className="text-2xl font-bold mt-5">
-          {user?.firstName} {user?.lastName}
+          {user.firstName} {user.lastName}
         </h1>
+        <div className="flex gap-4 mt-2 text-sm text-gray-400">
+          <span>{user?.followers?.length ?? 0} followers</span>
+          <span>{user?.following?.length ?? 0} following</span>
+        </div>
       </div>
       <div>
-        {tweets?.map((tweet) => (
-          <FeedCard key={tweet?.id} data={tweet as Tweet} />
+        {(user.tweets ?? []).map((item) => (
+          <FeedCard key={item?.id} data={item as Tweet} />
         ))}
       </div>
     </div>
