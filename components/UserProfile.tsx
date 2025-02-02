@@ -1,20 +1,44 @@
 "use client"; // Mark as Client Component
 
-import React from "react";
+import React, { useCallback } from "react";
 import { BsArrowLeftShort } from "react-icons/bs";
 import Image from "next/image";
-import { useGetUserById } from "@/hooks/user";
+import { useCurrentUser, useGetUserById } from "@/hooks/user";
 import FeedCard from "@/components/FeedCard";
 import { Tweet } from "@/gql/graphql";
 import { usePathname } from "next/navigation";
+import { graphQLClient } from "@/app/clients/api";
+import {
+  followUserMutations,
+  unFollowUserMutations,
+} from "@/graphql/mutation/user";
+import { useQueryClient } from "@tanstack/react-query";
 
 const UserProfile = () => {
   const path = usePathname();
   const currentUserPathURL = path.split("/").filter(Boolean).pop() ?? "";
+  const queryClient = useQueryClient();
 
-  // Always call hooks unconditionally.
+  const handleFollowUser = useCallback(async () => {
+    if (!currentUserPathURL) return;
+    await graphQLClient.request(followUserMutations, {
+      to: currentUserPathURL,
+    });
+    await queryClient.invalidateQueries({ queryKey: ["current-user"] });
+  }, [currentUserPathURL, queryClient]);
+
+  const handleUnfollowUser = useCallback(async () => {
+    if (!currentUserPathURL) return;
+    await graphQLClient.request(unFollowUserMutations, {
+      to: currentUserPathURL,
+    });
+    await queryClient.invalidateQueries({ queryKey: ["current-user"] });
+  }, [currentUserPathURL, queryClient]);
+
+  // get the user by the pathname
   const { data, isLoading, error } = useGetUserById(currentUserPathURL);
-
+  //get the current User which is logged in
+  const { user } = useCurrentUser();
   if (!currentUserPathURL) return null;
   if (isLoading)
     return (
@@ -57,15 +81,21 @@ const UserProfile = () => {
             <span>{data.getUserById?.following?.length ?? 0} following</span>
           </div>
 
-          {data.getUserById?.id !== currentUserPathURL &&
+          {data.getUserById?.id !== user?.id &&
             (data.getUserById?.followers?.some(
-              (f) => f?.id === currentUserPathURL,
+              (searchedUser) => searchedUser?.id === user?.id,
             ) ? (
-              <button className="bg-gray-300 text-sm font-semibold text-black px-4 py-2 rounded-full">
+              <button
+                onClick={handleUnfollowUser}
+                className="bg-gray-300 text-sm font-semibold text-black px-4 py-2 rounded-full"
+              >
                 Unfollow
               </button>
             ) : (
-              <button className="bg-white text-sm font-semibold text-black px-4 py-2 rounded-full">
+              <button
+                onClick={handleFollowUser}
+                className="bg-white text-sm font-semibold text-black px-4 py-2 rounded-full"
+              >
                 Follow
               </button>
             ))}

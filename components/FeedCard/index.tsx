@@ -12,7 +12,6 @@ interface FeedCardProps {
 
 const FeedCard: React.FC<FeedCardProps> = ({ data }) => {
   if (!data || !data.author) return null; // Prevent rendering if data is missing
-  console.log(data.author.id, "dekho mai aa gayaa");
 
   return (
     <Link href={`/${data.author.id}`} className="block">

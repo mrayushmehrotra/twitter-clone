@@ -21,6 +21,7 @@ interface TwitterSidebarButton {
 
 const TwitterLayout: React.FC<TwitterlayoutProps> = (props) => {
   const { user } = useCurrentUser();
+  console.log(user?.recommendedUsers);
 
   const sidebarMenuItems: TwitterSidebarButton[] = useMemo(
     () => [
@@ -122,7 +123,7 @@ const TwitterLayout: React.FC<TwitterlayoutProps> = (props) => {
                   />
                 )}
                 <div>
-                  <h3 className="sm:text-xl hidden ">
+                  <h3 className="text-xl">
                     {user.firstName} {user.lastName}
                   </h3>
                 </div>
@@ -135,10 +136,41 @@ const TwitterLayout: React.FC<TwitterlayoutProps> = (props) => {
           {props.children}
         </div>
         <div className="col-span-0 sm:col-span-3 p-5 ">
-          {!user && (
+          {!user ? (
             <div className="border p-5 bg-slate-700 rounded-lg">
               <h1 className="my-2 text-2xl">New to twitter?</h1>
               <LoginComponent />
+            </div>
+          ) : (
+            <div>
+              {user.recommendedUsers &&
+                user.recommendedUsers.map((el) => (
+                  <div
+                    key={el.id}
+                    className="flex items-center justify-between p-2 hover:bg-slate-600 rounded-lg"
+                  >
+                    <h1> User&apos;s you may know </h1>
+                    <Link href={`/${el.id}`}>
+                      <div className="flex items-center gap-3">
+                        {el.profileImageURL && (
+                          <Image
+                            src={el.profileImageURL}
+                            height={40}
+                            width={40}
+                            alt={el.firstName}
+                            className="rounded-full"
+                          />
+                        )}
+                        <div>
+                          <p className="font-semibold">{el.firstName}</p>
+                          <p className="text-sm text-gray-400">
+                            @{el.firstName.toLowerCase()}
+                          </p>
+                        </div>
+                      </div>
+                    </Link>
+                  </div>
+                ))}
             </div>
           )}
         </div>
