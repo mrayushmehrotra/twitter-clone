@@ -16,7 +16,12 @@ const UserProfile = () => {
   const { data, isLoading, error } = useGetUserById(currentUserPathURL);
 
   if (!currentUserPathURL) return null;
-  if (isLoading) return <p>Loading...</p>;
+  if (isLoading)
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="w-10 h-10 border-4 border-t-transparent border-gray-300 rounded-full animate-spin motion-safe:animate-[spin_0.3s_linear_infinite]"></div>
+      </div>
+    );
   if (error || !data) return <p>Error fetching user data</p>;
 
   return (
