@@ -10,3 +10,6 @@ cd twitter-clone
 npm install && npm run dev
 
 ```
+
+
+in the description of this repository, i have pinned the twitter-backend and yeah, of course you have to run the backend first to get all the data in frontend 
