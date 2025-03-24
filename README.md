@@ -3,8 +3,7 @@
 This is an Advance twitter clone built on Next.js, AWS, NeonDB 
 
 
-```
-bash
+```sh
 
 git clone https://github.com/mrayushmehrotra/twitter-clone
 cd twitter-clone
